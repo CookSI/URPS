@@ -1,0 +1,44 @@
+body{
+	position: relative;
+	
+	background: linear-gradient(0deg, #f06b25, #fec747);
+	background-size: 400% 400%;
+	
+	-webkit-animation: AnimationName 30s ease infinite;
+	-moz-animation: AnimationName 30s ease infinite;
+	-o-animation: AnimationName 30s ease infinite;
+	animation: AnimationName 30s ease infinite; 
+	}
+
+	 @-webkit-keyframes AnimationName {
+		0%{background-position:50% 0%}
+		50%{background-position:50% 100%}
+		100%{background-position:50% 0%}
+	}
+	@-moz-keyframes AnimationName {
+		0%{background-position:50% 0%}
+		50%{background-position:50% 100%}
+		100%{background-position:50% 0%}
+	}
+	@-o-keyframes AnimationName {
+		0%{background-position:50% 0%}
+		50%{background-position:50% 100%}
+		100%{background-position:50% 0%}
+	}
+	@keyframes AnimationName { 
+		0%{background-position:50% 0%}
+		50%{background-position:50% 100%}
+		100%{background-position:50% 0%}
+	} 
+}
+
+html, body{
+	width:100%;
+}
+.hands{
+	width: 100px;
+	height: 100px; 
+}
+#butt{
+	margin:0 auto;
+}

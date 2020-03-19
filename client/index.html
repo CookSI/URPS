@@ -1,0 +1,155 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>	
+	const socket = io('http://localhost');
+    import io from 'socket.io-client';
+	const ioClient = io.connect("http://localhost:2000");
+
+	
+	
+	//Variables
+		var player = {
+			var player.name = '';
+			var player.id = '';
+			var player.hand = 0;
+		};
+		var opponent = {
+			var opponent.name = '';
+			var opponent.id = '';
+			var opponent.hand = 0;
+		};
+		var socket = io();
+		var res;
+	//Events 
+		//is game ready?
+		socket.on('readyGameState',function(data){
+			if(data.state == 1){
+				document.getElementById('msg1').style.display = 'none';
+			}
+		});
+		//get opponent
+		socket.on('op', function(data){
+			opponent = JSON.parse(data);
+			console.log(opponent.name);
+			document.getElementById('p2name').innerHTML = opponent.name;
+		});
+		
+		//get play from opp
+		socket.on('played', function(data){
+			opponent.hand = data;
+		});
+		
+	//get players name and emit it to server and put it on the page 
+	function getplayerName(){
+	
+		playerName = prompt("Enter your screen name!","Player1");
+		while(!playerName){
+		playerName = prompt("Enter your screen name!","Player1");
+		}
+		
+		player.name = playerName;
+		document.getElementById('p1name').innerHTML = player.name;
+		document.getElementById('p2name').innerHTML = '???';
+		
+		
+		socket.emit('pName',{
+			name:playerName
+		});
+		
+	}
+	//get player hand 
+	function takeHand(hand,name){
+		
+		player.hand = hand;
+		var opponentId = opponent.id;
+		
+		//send play to server?
+		socket.emit('handPlayed' ,{ 
+			l_hand:hand
+		});
+	}
+	//When both players are connected wait 30 sec for each to player to play a hand
+		var waitforit = setInterval(function(){
+			if(player.hand != 0 && opponent.hand != 0){
+				evalMatch(player.hand, opponent.hand);
+			}
+		},1000);
+	//Compare the hands and declare a winner
+	function evalMatch(pone, ptwo){
+		
+		if(pone == ptwo){
+			res = "tie";  
+		}else if(pone == 1 && ptwo == 2){
+			res = "L"
+		}else if(pone == 1 && ptwo == 3){
+			res = "W"
+		}else if(pone == 2 && ptwo == 1){
+			res = "W"
+		}
+		else if(pone == 2 && ptwo == 3){
+			res = "L"
+		}else if(pone == 3 && ptwo == 1){
+			res = "L"
+		}else if(pone == 3 && ptwo == 2){
+			res = "W"
+		}
+		
+		console.log(res);
+	}
+	
+	
+	
+</script> 
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/client/URPS.css">
+	</head>
+	<body onLoad="getplayerName()">
+		
+		<h1>
+			ULTIMATE ROCK PAPER SCISSORS TOURNAMENT
+		</h1>
+		
+		<div id= "container">
+			<p id="msg1" style="display: block" >waiting for players ...</p>
+			<table>
+				<tr>
+					<td id="p1name">
+					
+					</td>
+					<td>
+						
+					</td>
+					<td id="p2name">
+						
+					</td>
+				</tr>	
+				<tr>
+					<td>
+						<img id="p1hand" src="/client/img/r_hand_l.png">
+					</td><td>
+						<img id="p2hand" src="/client/img/r_hand_r.png">
+					</td>
+				</tr>	
+				<tr>
+					<td></td>
+					<td id="butt">
+						<a Onclick="takeHand(1,'Rock')"><img src="/client/img/Rock.png" alt="Rock" class="hands" ></a>
+						<a Onclick="takeHand(2,'Paper')"><img src="/client/img/Paper.png" alt="Paper" class="hands"></a>
+						<a Onclick="takeHand(3,'Scissors')"><img src="/client/img/Scissors.png" alt="Scissors" class="hands"></a>
+					</td>
+					<td></td>
+				</tr>	
+			</table>
+		</div>
+		
+
+		<ul id="players">
+		
+		</ul>
+		
+	</body>
+	
+</html>
+

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body{
+				background: linear-gradient(0deg, #f06b25, #fec747);
+				background-size: 400% 400%;
+				
+				-webkit-animation: AnimationName 30s ease infinite;
+				-moz-animation: AnimationName 30s ease infinite;
+				-o-animation: AnimationName 30s ease infinite;
+				animation: AnimationName 30s ease infinite; 
+				}
+
+				 @-webkit-keyframes AnimationName {
+					0%{background-position:50% 0%}
+					50%{background-position:50% 100%}
+					100%{background-position:50% 0%}
+				}
+				@-moz-keyframes AnimationName {
+					0%{background-position:50% 0%}
+					50%{background-position:50% 100%}
+					100%{background-position:50% 0%}
+				}
+				@-o-keyframes AnimationName {
+					0%{background-position:50% 0%}
+					50%{background-position:50% 100%}
+					100%{background-position:50% 0%}
+				}
+				@keyframes AnimationName { 
+					0%{background-position:50% 0%}
+					50%{background-position:50% 100%}
+					100%{background-position:50% 0%}
+				} 
+			}
+		</style>
+	</head>
+	<body onLoad="playerName()">
+	
+		<h1>
+			ULTIMATE ROCK PAPER SCISSORS TOURNAMENT
+		</h1>
+		<table id="butt">
+			<tr>
+				<button class="hands" Onclick="takeHand(1,'Rock')">Rock</button>
+				<button class="hands" Onclick="takeHand(2,'Paper')">Paper</button>
+				<button class="hands" Onclick="takeHand(3,'Scissors')">Scissors</button>
+			</tr>	
+		</table>
+		<div></div>
+		
+	</body>
+	
+</html>
+
