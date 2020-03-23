@@ -1,24 +1,26 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>	
-	const socket = io('http://localhost');
-    import io from 'socket.io-client';
-	const ioClient = io.connect("http://localhost:2000");
+	//const socket = io('http://localhost');
+   // import io from 'socket.io-client';
+	//const ioClient = io.connect("http://localhost:2000");
 
 	
 	
 	//Variables
 		var player = {
-			var player.name = '';
-			var player.id = '';
-			var player.hand = 0;
+			 name : '',
+			 id : '',
+			 hand : 0
 		};
 		var opponent = {
-			var opponent.name = '';
-			var opponent.id = '';
-			var opponent.hand = 0;
+			 name : '',
+			 id : '',
+			 hand : 0
 		};
+		
 		var socket = io();
 		var res;
+		
 	//Events 
 		//is game ready?
 		socket.on('readyGameState',function(data){
@@ -58,10 +60,7 @@
 	}
 	//get player hand 
 	function takeHand(hand,name){
-		
-		player.hand = hand;
-		var opponentId = opponent.id;
-		
+		//player.hand = hand;
 		//send play to server?
 		socket.emit('handPlayed' ,{ 
 			l_hand:hand
@@ -74,6 +73,7 @@
 			}
 		},1000);
 	//Compare the hands and declare a winner
+	/*
 	function evalMatch(pone, ptwo){
 		
 		if(pone == ptwo){
@@ -95,7 +95,7 @@
 		
 		console.log(res);
 	}
-	
+	*/
 	
 	
 </script> 
@@ -113,25 +113,21 @@
 		
 		<div id= "container">
 			<p id="msg1" style="display: block" >waiting for players ...</p>
-			<table>
+			
+			<table class="">
 				<tr>
 					<td id="p1name">
 					
 					</td>
-					<td>
-						
-					</td>
+					
 					<td id="p2name">
-						
-					</td>
-				</tr>	
-				<tr>
-					<td>
-						<img id="p1hand" src="/client/img/r_hand_l.png">
-					</td><td>
-						<img id="p2hand" src="/client/img/r_hand_r.png">
-					</td>
-				</tr>	
+					
+					</td>	
+				</tr>
+			</table>
+					<img class ="phand" id="p1hand" src="/client/img/r_hand_l.png">
+					<img class ="phand" id="p2hand" src="/client/img/r_hand_r.png">
+			<table class="center">
 				<tr>
 					<td></td>
 					<td id="butt">

@@ -64,9 +64,9 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('handPlayed', function(data){
-		hand = JSON.parse(data);
-		opId = hand.id;
-		io.to(opId).emit('ophand', JSON.stringify(hand));
+		console.log(data.l_hand + " " + socket.id);
+		//opId = hand.id;
+		//io.to(opId).emit('ophand', JSON.stringify(hand));
 	});
 		
 	
