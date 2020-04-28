@@ -18,8 +18,14 @@ var io = require('socket.io')(serv,{});
 var globalPlayerList = [];
 var bracketPlayerList = [];
 
+// add tesing functionality
+
 io.sockets.on('connection', function(socket){
-		var player = {};
+		var player = {
+			id : '',
+			name : '',
+			res: 0
+		};
 		player.id = socket.id;
 		// globalPlayerList.push(player);
 		// console.log(globalPlayerList);
@@ -32,20 +38,31 @@ io.sockets.on('connection', function(socket){
 		
 		// socket.emit('list', globalPlayerList);
 		
-		if(globalPlayerList.length >= 4){ //ready for players start timer: less players more wait time 
+		if(globalPlayerList.length >= 2){ //ready for players start timer: less players more wait time 
+		io.sockets.emit('readyGameState',{
+			state:1
+		});
 		
-		io.sockets.emit('readyGameState',{state:1});
 		//start timer once the timer is done splice player list into a new braket 
-		bracketPlayerList = globalPlayerList.splice(0, globalPlayerList.length);
-			for(i = 0; i < bracketPlayerList.length-1; i=i+2){
-				console.log('bracket');
-				var roomName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-				var playerOne = bracketPlayerList[i].id;
-				var playerTwo = bracketPlayerList[i+1].id;
-				io.to(playerOne).emit('op', JSON.stringify(bracketPlayerList[i+1])); 
-				io.to(playerTwo).emit('op', JSON.stringify(bracketPlayerList[i])); 
-			}
+			setTimeout( () => {
+				bracketPlayerList = globalPlayerList.splice(0, globalPlayerList.length);
+				if(bracketPlayerList.length % 4 = 0){
+					for(i = 0; i < bracketPlayerList.length-1; i=i+2){
+						console.log('bracket');
+						var playerOne = bracketPlayerList[i].id;
+						var playerTwo = bracketPlayerList[i+1].id;
+						io.to(playerOne).emit('op', JSON.stringify(bracketPlayerList[i+1])); 
+						io.to(playerTwo).emit('op', JSON.stringify(bracketPlayerList[i])); 
+					}
+				}else{
+					while(bracketPlayerList.length % 4 !== 0){
+						
+					}
+				}
+				tournament(bracketPlayerList);
 				//then we want a loop to go through the player list and every 2 players is sent their oponent 
+				
+			},30000);
 		}else{ //not ready
 			io.sockets.emit('readyGameState',{state:0});
 		}
@@ -64,18 +81,13 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('handPlayed', function(data){
-		console.log(data.l_hand + " " + socket.id);
-		//opId = hand.id;
-		//io.to(opId).emit('ophand', JSON.stringify(hand));
+		console.log(data.l_hand + " " + socket.id + " " + data.op);
+		io.to(data.op).emit('ophand', data.l_hand);
 	});
-		
-	
-	
+			
 });
 
 
-
-	
 function findId(arr,userid){
 	for(i = 0; i < arr.length; ++i){;
 		if(arr[i].id == userid){
@@ -85,6 +97,39 @@ function findId(arr,userid){
 	return -1;
 }
 
+
+function tournament(contest){
+	if(contest.length > 1){
+		var i = 1;
+		while(i<=contest.length){
+			//swap contentants 
+			var j = Math.floor((i)/2);
+			var placeholderOne = contest[i];
+			var placeholderTwo = contest[j];
+			var placeholderThree = contest[i-1];
+			if(contest[i].res>contest[i-1].res){
+				contest[i] = placeholderTwo;
+				contest[j] = placeholderOne;
+			}else{
+				contest[i-1] = placeholderTwo;
+				contest[j] = placeholderThree;
+			}
+			i=i+2;
+			console.log(contest);
+		}
+		i = (i-1)/2;
+		console.log(i);
+		while(i>0){
+			contest.pop();
+			i = i-1;
+		}
+		console.log(contest);
+		console.log(i);
+		tournament(contest);
+	}else{
+		console.log(contest[0] +" is the Winner");
+	}
+}	
 setInterval(function(){
 	
 		

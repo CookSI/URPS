@@ -1,11 +1,5 @@
 <script src="/socket.io/socket.io.js"></script>
-<script>	
-	//const socket = io('http://localhost');
-   // import io from 'socket.io-client';
-	//const ioClient = io.connect("http://localhost:2000");
-
-	
-	
+<script>		
 	//Variables
 		var player = {
 			 name : '',
@@ -25,7 +19,8 @@
 		//is game ready?
 		socket.on('readyGameState',function(data){
 			if(data.state == 1){
-				document.getElementById('msg1').style.display = 'none';
+				document.getElementById('msg1').innerHTML = "...";
+				countDown();
 			}
 		});
 		//get opponent
@@ -36,8 +31,10 @@
 		});
 		
 		//get play from opp
-		socket.on('played', function(data){
+		socket.on('ophand', function(data){
+			console.log(data);
 			opponent.hand = data;
+			console.log("opponent hand:" + opponent.hand);
 		});
 		
 	//get players name and emit it to server and put it on the page 
@@ -56,46 +53,95 @@
 		socket.emit('pName',{
 			name:playerName
 		});
-		
 	}
+	// gameReady Countdown
+	function countDown(){
+		var time = 30;
+		var gameTimer = setInterval(function(){
+			if(time <= 0){
+				document.getElementById('msg1').innerHTML = "";
+			}else{
+				document.getElementById('msg1').innerHTML = "Game staring in " + time + " seconds!";
+			}
+			--time; 
+		}, 1000);
+	}
+	
+	function endCoundDown(){
+		clearInterval(gameTimer);
+	}
+			
+
 	//get player hand 
 	function takeHand(hand,name){
-		//player.hand = hand;
-		//send play to server?
+		player.hand = hand;
+		
 		socket.emit('handPlayed' ,{ 
-			l_hand:hand
+			l_hand:hand,
+			op:opponent.id
 		});
+		switch(hand){
+			case 1:
+				document.getElementById("p1hand").setAttribute("src", "/client/img/r_hand_l.png");
+			break;
+			
+			case 2:
+				document.getElementById("p1hand").setAttribute("src", "/client/img/p_hand_l.png");
+			break;
+			
+			case 3:
+				document.getElementById("p1hand").setAttribute("src", "/client/img/s_hand_l.png");
+			break;
+		}
+	
+	
 	}
 	//When both players are connected wait 30 sec for each to player to play a hand
-		var waitforit = setInterval(function(){
-			if(player.hand != 0 && opponent.hand != 0){
-				evalMatch(player.hand, opponent.hand);
-			}
-		},1000);
+	var evalChk = setInterval(function(){
+		if((player.hand != 0 && typeof(player.hand) !== "undefined") && (opponent.hand != 0 && typeof(opponent.hand) != "undefined")){
+			evalMatch(player.hand, opponent.hand);
+			clearEval();
+		}
+	},1000);
+	function clearEval(){
+		clearInterval(evalChk);
+	}
 	//Compare the hands and declare a winner
-	/*
 	function evalMatch(pone, ptwo){
+		// maybe i'll add funny gifs in the future
 		
+		if (typeof(ptwo) === "undefined"){
+			evalMatch(pone, ptwo);
+		}
 		if(pone == ptwo){
-			res = "tie";  
+			res = "T";  
+			document.getElementById('msg2').innerHTML = "TIE!";
 		}else if(pone == 1 && ptwo == 2){
-			res = "L"
+			res = 0;
+			document.getElementById('msg2').innerHTML = "PAPER BEATS ROCK " + opponent.name + " WINS!";
 		}else if(pone == 1 && ptwo == 3){
-			res = "W"
+			res = 1;
+			document.getElementById('msg2').innerHTML = "ROCK BEATS SCISSORS " + player.name + " WINS!";
 		}else if(pone == 2 && ptwo == 1){
-			res = "W"
+			res = 1;
+			document.getElementById('msg2').innerHTML = "PAPER BEATS ROCK " + player.name + " WINS!";
 		}
 		else if(pone == 2 && ptwo == 3){
-			res = "L"
+			res = 0;
+			document.getElementById('msg2').innerHTML = "SCISSORS BEAT PAPER " + opponent.name + " WINS!";
 		}else if(pone == 3 && ptwo == 1){
-			res = "L"
+			res = 0; 
+			document.getElementById('msg2').innerHTML = "PAPER BEATS ROCK " + opponent.name + " WINS!";
 		}else if(pone == 3 && ptwo == 2){
-			res = "W"
+			res = 1;
+			document.getElementById('msg2').innerHTML = "SCISSORS BEAT PAPER " + player.name + " WINS!";
 		}
 		
-		console.log(res);
+		if (res == "0" || res == "1")
+			socket.emit('result', {
+				resultEmit:res
+			});
 	}
-	*/
 	
 	
 </script> 
@@ -113,7 +159,7 @@
 		
 		<div id= "container">
 			<p id="msg1" style="display: block" >waiting for players ...</p>
-			
+			<p id="msg2"></p>
 			<table class="">
 				<tr>
 					<td id="p1name">
@@ -139,7 +185,6 @@
 				</tr>	
 			</table>
 		</div>
-		
 
 		<ul id="players">
 		
