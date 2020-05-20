@@ -24,7 +24,7 @@ io.sockets.on('connection', function(socket){
 		var player = {
 			id : '',
 			name : '',
-			res: 0
+			res: ''
 		};
 		player.id = socket.id;
 		// globalPlayerList.push(player);
@@ -46,23 +46,33 @@ io.sockets.on('connection', function(socket){
 		//start timer once the timer is done splice player list into a new braket 
 			setTimeout( () => {
 				bracketPlayerList = globalPlayerList.splice(0, globalPlayerList.length);
-				if(bracketPlayerList.length % 4 = 0){
-					for(i = 0; i < bracketPlayerList.length-1; i=i+2){
-						console.log('bracket');
-						var playerOne = bracketPlayerList[i].id;
-						var playerTwo = bracketPlayerList[i+1].id;
+				
+				while(bracketPlayerList.length % 4 !== 0){
+					var computer = {
+						id : '',
+						name : 'CPU',
+						res: 0
+					};
+					bracketPlayerList.push(computer);
+				}
+				
+				for(i = 0; i < bracketPlayerList.length-1; i=i+2){
+					console.log('bracket');
+					var playerOne = bracketPlayerList[i].id;
+					var playerTwo = bracketPlayerList[i+1].id;
+					if(bracketPlayerList[i+1].name == 'CPU' && bracketPlayerList[i].name !== 'CPU' ){
+						bracketPlayerList[i].res = 1;
+					}else{
 						io.to(playerOne).emit('op', JSON.stringify(bracketPlayerList[i+1])); 
 						io.to(playerTwo).emit('op', JSON.stringify(bracketPlayerList[i])); 
 					}
-				}else{
-					while(bracketPlayerList.length % 4 !== 0){
-						
-					}
 				}
-				tournament(bracketPlayerList);
+				
+					
+				//tournament(bracketPlayerList);
 				//then we want a loop to go through the player list and every 2 players is sent their oponent 
 				
-			},30000);
+			},60000);
 		}else{ //not ready
 			io.sockets.emit('readyGameState',{state:0});
 		}
@@ -107,7 +117,7 @@ function tournament(contest){
 			var placeholderOne = contest[i];
 			var placeholderTwo = contest[j];
 			var placeholderThree = contest[i-1];
-			if(contest[i].res>contest[i-1].res){
+			if(contest[i].res >= contest[i-1].res){
 				contest[i] = placeholderTwo;
 				contest[j] = placeholderOne;
 			}else{
@@ -125,15 +135,26 @@ function tournament(contest){
 		}
 		console.log(contest);
 		console.log(i);
-		tournament(contest);
+		//tournament(contest);
 	}else{
-		console.log(contest[0] +" is the Winner");
+		console.log(contest[0].name +" is the Winner");
 	}
 }	
 setInterval(function(){
-	
-		
-},1000/25)
+	var nextRound = 1;
+	for(var i = 0; i < bracketPlayerList.length; i++){
+		if(bracketPlayerList[i].res == ''){
+			nextRound = 0;
+		}
+		if(nextRound == 1){
+			tournament(bracketPlayerList);
+			for(var j = 0; j < bracketPlayerList.length; j++){
+				bracketPlayerList[j].res == ''
+			}
+			break;
+		}
+	} 
+},1000/30)
 
 
 
